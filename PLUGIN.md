@@ -9,11 +9,12 @@ received.
 - **One reaction per member per post.** Picking another switches to it; picking the same one
   again takes it back.
 - **A quick reaction and a picker.** Clicking (or tapping) React adds the default reaction -
-  Like, out of the box - or takes back the reaction you have. Resting the mouse on the button,
-  or holding a finger on it on a phone, opens a picker with every reaction.
+  Like, out of the box - or takes back the reaction you have. Pressing and holding the
+  button, with the mouse or a finger, opens a picker with every reaction.
 - **A summary on every post.** The post's most used reactions are pictured beside the
-  number of reactions ("You and 3 others" when one of them is yours). Clicking it lists who
-  reacted, with a tab for each reaction.
+  number of reactions ("You and 3 others" when one of them is yours - and nothing when yours
+  is the only one, since the button already shows it). Clicking it lists who reacted, with
+  their avatars and a tab for each reaction.
 - **Reactions you choose.** Add, rename, reorder, deactivate and delete reactions, and upload
   an image for each, under Configuration -> Reactions in the Admin CP.
 - **Notifications.** A post's author gets a private message the first time each member reacts
@@ -112,8 +113,9 @@ No copy of the PM is kept in the reacting member's Sent Items.
 
 ## Styling and theming
 
-The reactions bar is added to `postbit` and `postbit_classic` straight after
-`{$post['signature']}`, and the notification option to the end of `usercp_options_pms`. If a
+The reactions bar is added to `postbit` and `postbit_classic` at the foot of the post's
+content, after `{$post['iplogged']}` or `{$post['input_editreason']}`, whichever comes last,
+and the notification option to the end of `usercp_options_pms`. If a
 theme you add later is missing them, deactivate and activate the plugin to add them again.
 
 The plugin's look is in the `reactions.css` stylesheet, attached to the master theme so every

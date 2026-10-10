@@ -37,8 +37,9 @@ test.describe('reacting to a post', () => {
 		expect(await reactionOf('trooper1', opening())).toBe('Like');
 		await expect(reactButton(page, opening())).toHaveAttribute('aria-pressed', 'true');
 		await expect(reactButton(page, opening())).toHaveClass(/reactions-button--active/);
-		await expect(summary(page, opening())).toContainText('You');
-		expect(await summaryIcons(page, opening())).toEqual(['Like']);
+		// The button shows the member's reaction; a summary reading "You" would repeat it.
+		await expect(reactButton(page, opening())).toHaveText('Like');
+		await expect(summary(page, opening())).toHaveCount(0);
 
 		await clickReact(page, opening());
 		expect(await reactionOf('trooper1', opening())).toBeNull();
@@ -59,7 +60,6 @@ test.describe('reacting to a post', () => {
 
 		await page.reload();
 		await expect(reactButton(page, opening())).toHaveText('Love');
-		expect(await summaryIcons(page, opening())).toEqual(['Love']);
 	});
 
 	test('picking another reaction switches to it rather than adding a second', async ({ page }) => {
@@ -71,7 +71,6 @@ test.describe('reacting to a post', () => {
 		expect(await reactionOf('trooper1', opening())).toBe('Haha');
 		expect(await countReactions(opening())).toBe(1);
 		await expect(reactButton(page, opening())).toHaveText('Haha');
-		expect(await summaryIcons(page, opening())).toEqual(['Haha']);
 	});
 
 	test('picking the reaction already held takes it back', async ({ page }) => {

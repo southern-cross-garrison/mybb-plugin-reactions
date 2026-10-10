@@ -43,10 +43,13 @@ test.describe('members: reacting', () => {
 		});
 
 		await openPicker(page, opening());
+		// Off the picker, so no reaction is shown zoomed as if pointed at.
+		await page.mouse.move(5, 5);
 		await ring(picker(page, opening()));
 		await shot(post(page, opening()), 'members/picker');
 
-		await page.mouse.move(5, 5);
+		// Moving away leaves the picker open; clicking elsewhere closes it.
+		await page.locator('body').click({ position: { x: 5, y: 5 } });
 		await expect(picker(page, opening())).toBeHidden();
 		await pickReaction(page, opening(), 'Love');
 		await page.mouse.move(5, 5);
@@ -65,6 +68,9 @@ test.describe('members: reacting', () => {
 		await summary(page, opening()).click();
 		const modal = page.locator('.reactions-who-modal');
 		await expect(modal.locator('.reactions-who-row')).toHaveCount(4);
+		// Faded all the way in, not caught part way.
+		await expect(page.locator('.blocker')).toHaveCSS('opacity', '1');
+		await expect(modal).toHaveCSS('opacity', '1');
 		await shot(modal, 'members/who-reacted');
 	});
 

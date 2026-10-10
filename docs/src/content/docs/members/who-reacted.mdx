@@ -11,18 +11,19 @@ import summary from '../../../assets/screenshots/members/summary.png';
 import who from '../../../assets/screenshots/members/who-reacted.png';
 
 Under every post that has reactions is a summary: the post's most used reactions, and how
-many there are. If one of them is yours it says "You and 3 others".
+many there are. If one of them is yours it says "You and 3 others". If yours is the only
+one there is no summary - the button already shows your reaction.
 
 ## See who reacted
 
 <Steps>
 
-1. Click the summary under the post.
+1. Click the summary at the bottom right of the post.
 
    <Image src={summary} alt="A post's reaction summary, circled" />
 
-2. Everyone who reacted is listed, newest first. Click a reaction's tab to see just the
-   people who picked it, or a name to open their profile.
+2. Everyone who reacted is listed with their avatar, newest first. Click a reaction's tab
+   to see just the people who picked it, or a name to open their profile.
 
    <Image src={who} alt="The list of who reacted, with tabs for All, Love, Like and Haha" />
 

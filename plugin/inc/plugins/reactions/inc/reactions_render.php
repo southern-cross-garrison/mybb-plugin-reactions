@@ -47,12 +47,20 @@ function reactions_render_bar(array $post, $can_react)
     $pid = (int)$post['pid'];
     $data = reactions_for_post($pid);
 
-    $summary = reactions_render_summary($pid, $data);
     $controls = '';
-
     if($can_react)
     {
         $controls = reactions_render_controls($pid, $data);
+    }
+
+    // When the member's own reaction is the only one, the React button already shows it,
+    // and a summary reading "You" beside it would say it twice. Without the button (an
+    // unapproved post, seen by a moderator) the summary is the only place it shows, so it
+    // stays.
+    $summary = '';
+    if($controls === '' || $data['total'] != 1 || !$data['mine'])
+    {
+        $summary = reactions_render_summary($pid, $data);
     }
 
     if($summary === '' && $controls === '')
@@ -207,7 +215,7 @@ function reactions_render_who(array $post, $filter_rid = 0)
     $members = array();
     $counts = array();
     $query = $db->query("
-        SELECT r.rid, r.uid, u.username, u.usergroup, u.displaygroup
+        SELECT r.rid, r.uid, u.username, u.usergroup, u.displaygroup, u.avatar, u.avatardimensions
         FROM " . TABLE_PREFIX . "reactions_post r
         INNER JOIN " . TABLE_PREFIX . "users u ON (u.uid = r.uid)
         WHERE r.pid = {$pid}
@@ -260,6 +268,10 @@ function reactions_render_who(array $post, $filter_rid = 0)
         eval("\$tabs .= \"" . $templates->get("reactions_who_tab", 1, 0) . "\";");
     }
 
+    // A member who has turned avatars off in the User CP sees the default one for
+    // everybody, as the postbit does.
+    $show_avatars = empty($mybb->user['uid']) || !empty($mybb->user['showavatars']);
+
     $rows = '';
     foreach($members as $member)
     {
@@ -268,10 +280,14 @@ function reactions_render_who(array $post, $filter_rid = 0)
             continue;
         }
         $reaction = reactions_template_reaction($active[(int)$member['rid']]);
+        $avatar = $show_avatars
+            ? format_avatar($member['avatar'], $member['avatardimensions'])
+            : format_avatar('');
         $row = array(
             'rid'         => (int)$member['rid'],
             'reaction'    => $reaction['name'],
             'image_url'   => $reaction['image_url'],
+            'avatar'      => $avatar['image'],
             'profilelink' => build_profile_link(
                 format_name(htmlspecialchars_uni($member['username']), $member['usergroup'], $member['displaygroup']),
                 $member['uid']

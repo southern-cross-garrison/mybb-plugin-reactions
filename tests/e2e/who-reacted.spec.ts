@@ -33,6 +33,13 @@ test.describe('who reacted', () => {
 		await expect(rows).toHaveCount(3);
 		// Newest first.
 		await expect(rows.nth(0)).toContainText('trooper3');
+		// Each with the member's avatar - the default one, for the fixtures - badged with
+		// the reaction.
+		await expect(rows.nth(0).locator('.reactions-who-avatar-image')).toHaveAttribute(
+			'src',
+			/default_avatar\.png$/
+		);
+		await expect(rows.nth(0).locator('.reactions-who-badge')).toHaveAttribute('alt', 'Love');
 
 		await tabs.nth(1).click();
 		await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
@@ -50,6 +57,55 @@ test.describe('who reacted', () => {
 			'href',
 			/member\.php\?action=profile&uid=\d+/
 		);
+	});
+
+	test('switching tabs keeps the header where it opened, and the underline follows', async ({
+		page,
+	}) => {
+		await loginAs(page, 'author');
+		await openThread(page);
+		await summary(page, opening()).click();
+
+		// In the overlay and faded in: MyBB adds the popup to the foot of the page first.
+		const modal = page.locator('.blocker .reactions-who-modal');
+		const heading = modal.locator('.reactions-who-heading');
+		await expect(page.locator('.blocker')).toHaveCSS('opacity', '1');
+		await expect(modal).toHaveCSS('opacity', '1');
+		const opened = (await heading.boundingBox())!;
+
+		// Haha has one row of the three: a shorter list must not re-centre the popup.
+		const haha = modal.locator('.reactions-who-tab', { hasText: 'Haha' });
+		await haha.click();
+		await expect(modal.locator('.reactions-who-row:visible')).toHaveCount(1);
+		const after = (await heading.boundingBox())!;
+		expect(after.y).toBe(opened.y);
+
+		const underline = await modal
+			.locator('.reactions-who-tabs')
+			.evaluate((tabs) => getComputedStyle(tabs, '::after').width);
+		const width = await haha.evaluate((tab) => (tab as HTMLElement).offsetWidth);
+		expect(parseFloat(underline)).toBeCloseTo(width, 0);
+
+		// The list fits the rows it shows - no empty space under one row, none cut off when
+		// it grows back to three - with the header still where it opened.
+		const list = modal.locator('.reactions-who-list');
+		const gapUnderRows = () =>
+			list.evaluate((l) => {
+				const rows = Array.from(l.querySelectorAll('.reactions-who-row:not([hidden])'));
+				const last = rows[rows.length - 1].getBoundingClientRect().bottom;
+				const padding = parseFloat(getComputedStyle(l).paddingBottom);
+				return l.getBoundingClientRect().bottom - last - padding;
+			});
+		expect(await gapUnderRows()).toBeCloseTo(0, 0);
+		await modal.locator('.reactions-who-tab', { hasText: 'All' }).click();
+		await expect(modal.locator('.reactions-who-row:visible')).toHaveCount(3);
+		expect(await gapUnderRows()).toBeCloseTo(0, 0);
+		expect((await heading.boundingBox())!.y).toBe(opened.y);
+
+		// The strip of tabs scrolls sideways if it has to, but never up and down.
+		const strip = modal.locator('.reactions-who-tabs');
+		await expect(strip).toHaveCSS('overflow-y', 'hidden');
+		expect(await strip.evaluate((tabs) => tabs.scrollHeight - tabs.clientHeight)).toBe(0);
 	});
 
 	test('guests can see who reacted', async ({ page }) => {

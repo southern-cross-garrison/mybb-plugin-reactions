@@ -7,13 +7,16 @@ sidebar:
 
 Activating the plugin edits two of MyBB's templates in every theme:
 
-- `postbit` and `postbit_classic` get `{$post['reactions']}` straight after
-  `{$post['signature']}` - under the message, outside the part quick edit replaces.
+- `postbit` and `postbit_classic` get `{$post['reactions']}` at the foot of the post,
+  straight after whichever of `{$post['iplogged']}` and `{$post['input_editreason']}` comes
+  last - under the message and the IP address, outside the part quick edit replaces. The
+  stylesheet lines it up on the right.
 - `usercp_options_pms` gets `{$reactions_usercp_option}` at the end.
 
 Deactivating takes both out again. If you add a theme after activating, deactivate and
-activate the plugin to edit that theme too. A theme without `{$post['signature']}` in its
-postbit won't get the bar; add `{$post['reactions']}` wherever you want it.
+activate the plugin to edit that theme too. A theme with neither `{$post['iplogged']}` nor
+`{$post['input_editreason']}` in its postbit won't get the bar; add `{$post['reactions']}`
+wherever you want it.
 
 ## Restyling
 

@@ -38,9 +38,19 @@ export async function settled(page: Page, pid: number): Promise<void> {
 	await expect(bar(page, pid)).not.toHaveAttribute('aria-busy', 'true');
 }
 
-/** Rest the mouse on the React button until the picker opens. */
+/** Press and hold the mouse on an element, the way a long press does. */
+export async function holdMouse(page: Page, target: Locator, ms = 800): Promise<void> {
+	await target.scrollIntoViewIfNeeded();
+	const box = (await target.boundingBox())!;
+	await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+	await page.mouse.down();
+	await page.waitForTimeout(ms);
+	await page.mouse.up();
+}
+
+/** Hold the mouse on the React button until the picker opens. */
 export async function openPicker(page: Page, pid: number): Promise<void> {
-	await reactButton(page, pid).hover();
+	await holdMouse(page, reactButton(page, pid));
 	await expect(picker(page, pid)).toBeVisible();
 }
 

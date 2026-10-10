@@ -2,7 +2,7 @@
 
 Facebook-style reactions for MyBB 1.8 posts. Administrators choose the reactions and upload
 their images in the Admin CP; members pick one per post from a picker that opens when they
-rest the mouse on the React button, or hold a finger on it. See [PLUGIN.md](PLUGIN.md) for
+press and hold the React button. See [PLUGIN.md](PLUGIN.md) for
 what the plugin does; this file covers the development environment and the test suite.
 
 ## Quick start
@@ -102,10 +102,11 @@ Link][smartlink] plugin, so `scripts/install-smartlink.sh` installs that too, pi
 ## How the plugin gets into a post
 
 The bar is `{$post['reactions']}`, added to `postbit` and `postbit_classic` by a template
-edit on activation (and taken out on deactivation), straight after `{$post['signature']}`.
-The signature is in every theme's postbit, and in both MyBB's and the garrison's it sits
-below the message rather than inside it - which matters, because quick edit replaces the
-message's container wholesale. The User CP opt-out is added to the end of
+edit on activation (and taken out on deactivation), at the foot of the post's content:
+straight after whichever of `{$post['iplogged']}` and `{$post['input_editreason']}` comes
+last. Every theme's postbit has both, though MyBB's and the garrison's order them
+differently, and in both the later one ends the content - below the message rather than
+inside it, which matters, because quick edit replaces the message's container wholesale. The User CP opt-out is added to the end of
 `usercp_options_pms` the same way.
 
 The plugin's own templates live in the master template set, and its CSS in
@@ -150,7 +151,7 @@ closed thread and a thread in Staff Only. All users share the password `testpass
 | `admin-reactions` | The Admin CP list and usage counts, adding with an upload, every upload refusal (non-images, wrong type, size), editing, replacing images, activating, ordering, deleting, the admin log |
 | `svg-sanitizing`  | The SVG sanitizer against script, handlers, links, foreignObject, animations, external references, CSS and DOCTYPEs; an uploaded hostile SVG opened directly runs nothing                |
 | `react-flow`      | Quick reaction, picking, switching, taking back, the summary's counts, wording and pictures                                                                                              |
-| `picker`          | Hover timing, keyboard, closing, and on a touch screen tap versus press-and-hold                                                                                                         |
+| `picker`          | Long press with the mouse, hover not opening it, keyboard, closing, staying on screen, and on a touch screen tap versus press-and-hold                                                   |
 | `who-reacted`     | The popup and its tabs, guests, the page version without a script                                                                                                                        |
 | `permissions`     | Guests, banned members, forums the member cannot see, post keys, GET, inactive or unknown reactions and posts, unapproved and deleted posts                                              |
 | `notifications`   | The PM and its links, once per member per post, never for your own, the board setting, the User CP opt-out, ignore lists                                                                 |

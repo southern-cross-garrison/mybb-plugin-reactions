@@ -114,11 +114,14 @@ function reactions_uninstall_templates()
 /**
  * Put the plugin into every theme's templates.
  *
- * The reactions bar goes straight after the signature. Every postbit has one, in MyBB's own templates
- * and in the garrison theme's alike, and in both it sits below the message rather than
- * inside it - which matters, because quick edit replaces the message's container
- * wholesale, and a bar inside it would be gone after the first edit until the page was
- * reloaded.
+ * The reactions bar goes at the foot of the post's content, under the IP address row:
+ * straight after whichever of {$post['iplogged']} and {$post['input_editreason']} comes
+ * last. Every postbit has both, in MyBB's own templates and in the garrison theme's alike,
+ * but not in the same order - MyBB's puts the IP address in a row with the edit reason
+ * after it, the garrison's puts it last - and the later of the two is the end of the
+ * content in both. That is below the message rather than inside it, which matters: quick
+ * edit replaces the message's container wholesale, and a bar inside it would be gone after
+ * the first edit until the page was reloaded.
  *
  * The opt-out goes at the end of the PM options, whose last row differs from theme to
  * theme - so it is anchored to the end of the template rather than to any one of them.
@@ -131,12 +134,13 @@ function reactions_apply_template_edits()
 
     reactions_revert_template_edits();
 
+    $anchor = '(?:' . preg_quote("{\$post['iplogged']}", '#') . '|' . preg_quote("{\$post['input_editreason']}", '#') . ')';
     foreach(array('postbit', 'postbit_classic') as $title)
     {
         find_replace_templatesets(
             $title,
-            '#' . preg_quote("{\$post['signature']}", '#') . '#',
-            "{\$post['signature']}" . REACTIONS_POSTBIT_VARIABLE,
+            '#(' . $anchor . ')(?!.*' . $anchor . ')#s',
+            '${1}' . REACTIONS_POSTBIT_VARIABLE,
             1,
             false,
             1

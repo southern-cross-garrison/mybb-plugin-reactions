@@ -3,6 +3,7 @@ import { loginAs } from '../helpers/auth';
 import { mainThread, react, reactionOf } from '../helpers/db';
 import {
 	bar,
+	holdMouse,
 	openPicker,
 	openThread,
 	picker,
@@ -14,9 +15,10 @@ import {
 const opening = () => mainThread().pids[0];
 
 /**
- * The picker opens the way Facebook's does: the mouse resting on the button, a finger
- * held on it, or the arrow keys - and a plain click never opens it, because a click is
- * the quick reaction.
+ * The picker opens on a long press - the mouse or a finger held on the button - or the
+ * arrow keys. A plain click never opens it, because a click is the quick reaction, and
+ * neither does hovering: the button sits among the post's controls, in the way of the
+ * pointer on its way to Edit.
  */
 test.describe('the reaction picker', () => {
 	test.beforeEach(async ({ page }) => {
@@ -33,34 +35,118 @@ test.describe('the reaction picker', () => {
 		expect(names).toEqual(['Like', 'Love', 'Haha', 'Wow', 'Sad', 'Angry']);
 	});
 
-	test('opens only once the mouse has rested on the button, and closes when it leaves', async ({
+	test('hovering does not open it; holding the mouse button down does, without reacting', async ({
 		page,
 	}) => {
 		await openThread(page);
 
 		await reactButton(page, opening()).hover();
-		// Not yet: passing over the button on the way somewhere else should not pop it.
-		await page.waitForTimeout(150);
+		await page.waitForTimeout(800);
 		await expect(picker(page, opening())).toBeHidden();
 
+		await holdMouse(page, reactButton(page, opening()));
 		await expect(picker(page, opening())).toBeVisible();
 		await expect(reactButton(page, opening())).toHaveAttribute('aria-expanded', 'true');
+		// The click that ends the hold is not the quick reaction.
+		await page.waitForTimeout(300);
+		expect(await reactionOf('trooper1', opening())).toBeNull();
 
-		// Crossing from the button into the picker keeps it open.
-		await pickerItem(page, opening(), 'Wow').hover();
+		// It stays open once the mouse has moved off, until something is picked.
+		await page.mouse.move(5, 5);
 		await page.waitForTimeout(500);
 		await expect(picker(page, opening())).toBeVisible();
 
-		await page.mouse.move(5, 5);
+		await pickerItem(page, opening(), 'Wow').click();
+		await settled(page, opening());
+		expect(await reactionOf('trooper1', opening())).toBe('Wow');
+	});
+
+	test('a hold that wanders off the button does not open it', async ({ page }) => {
+		await openThread(page);
+		const box = (await reactButton(page, opening()).boundingBox())!;
+
+		await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+		await page.mouse.down();
+		await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 40);
+		await page.waitForTimeout(800);
+		await page.mouse.up();
+
 		await expect(picker(page, opening())).toBeHidden();
-		await expect(reactButton(page, opening())).toHaveAttribute('aria-expanded', 'false');
+		expect(await reactionOf('trooper1', opening())).toBeNull();
+	});
+
+	test('holding the button, sliding onto a reaction and letting go picks it', async ({ page }) => {
+		await openThread(page);
+		const button = (await reactButton(page, opening()).boundingBox())!;
+
+		await page.mouse.move(button.x + button.width / 2, button.y + button.height / 2);
+		await page.mouse.down();
+		await expect(picker(page, opening())).toBeVisible();
+
+		const haha = (await pickerItem(page, opening(), 'Haha').boundingBox())!;
+		await page.mouse.move(haha.x + haha.width / 2, haha.y + haha.height / 2, { steps: 5 });
+		await expect(pickerItem(page, opening(), 'Haha')).toHaveClass(/reactions-picker-item--hover/);
+		await page.mouse.up();
+		await settled(page, opening());
+
+		expect(await reactionOf('trooper1', opening())).toBe('Haha');
+		await expect(reactButton(page, opening())).toHaveText('Haha');
+	});
+
+	test("a press that starts on the button's icon is a press on the button, not a drag", async ({
+		page,
+	}) => {
+		await openThread(page);
+		// A real browser that starts dragging the picture cancels the press and swallows
+		// the release; Playwright's mouse carries on regardless, so watch for the drag.
+		await page.evaluate(() => {
+			(window as any).drags = 0;
+			document.addEventListener('dragstart', () => (window as any).drags++);
+		});
+		const icon = (await reactButton(page, opening()).locator('img').boundingBox())!;
+
+		await page.mouse.move(icon.x + icon.width / 2, icon.y + icon.height / 2);
+		await page.mouse.down();
+		await expect(picker(page, opening())).toBeVisible();
+
+		const love = (await pickerItem(page, opening(), 'Love').boundingBox())!;
+		await page.mouse.move(love.x + love.width / 2, love.y + love.height / 2, { steps: 5 });
+		await page.mouse.up();
+		await settled(page, opening());
+
+		expect(await page.evaluate(() => (window as any).drags)).toBe(0);
+		expect(await reactionOf('trooper1', opening())).toBe('Love');
+	});
+
+	test('letting go off the picker leaves it open, without reacting', async ({ page }) => {
+		await openThread(page);
+		const button = (await reactButton(page, opening()).boundingBox())!;
+
+		await page.mouse.move(button.x + button.width / 2, button.y + button.height / 2);
+		await page.mouse.down();
+		await expect(picker(page, opening())).toBeVisible();
+		await page.mouse.move(button.x + button.width / 2, button.y + 200, { steps: 5 });
+		await page.mouse.up();
+
+		await page.waitForTimeout(300);
+		await expect(picker(page, opening())).toBeVisible();
+		expect(await reactionOf('trooper1', opening())).toBeNull();
+	});
+
+	test('a picker too wide to open leftward is kept on screen', async ({ page }) => {
+		await page.setViewportSize({ width: 360, height: 800 });
+		await openThread(page);
+		await openPicker(page, opening());
+
+		const box = (await picker(page, opening()).boundingBox())!;
+		expect(box.x).toBeGreaterThanOrEqual(0);
+		expect(box.x + box.width).toBeLessThanOrEqual(360);
 	});
 
 	test('a plain click reacts rather than opening the picker', async ({ page }) => {
 		await openThread(page);
 
-		// Clicked without resting first, the way a hurried click lands.
-		await reactButton(page, opening()).click({ delay: 0 });
+		await reactButton(page, opening()).click();
 		await settled(page, opening());
 
 		expect(await reactionOf('trooper1', opening())).toBe('Like');
@@ -188,5 +274,32 @@ test.describe('the reaction picker on a touch screen', () => {
 		await settled(page, opening());
 		expect(await reactionOf('trooper1', opening())).toBe('Sad');
 		await expect(bar(page, opening()).locator('.reactions-button')).toHaveText('Sad');
+	});
+
+	test('holding, sliding onto a reaction and lifting the finger picks it', async ({ page }) => {
+		await openThread(page);
+		await reactButton(page, opening()).scrollIntoViewIfNeeded();
+		const button = (await reactButton(page, opening()).boundingBox())!;
+		const cdp = await page.context().newCDPSession(page);
+		await cdp.send('Input.dispatchTouchEvent', {
+			type: 'touchStart',
+			touchPoints: [{ x: button.x + button.width / 2, y: button.y + button.height / 2 }],
+		});
+		await expect(picker(page, opening())).toBeVisible();
+
+		const wow = (await pickerItem(page, opening(), 'Wow').boundingBox())!;
+		const scrollY = await page.evaluate(() => window.scrollY);
+		await cdp.send('Input.dispatchTouchEvent', {
+			type: 'touchMove',
+			touchPoints: [{ x: wow.x + wow.width / 2, y: wow.y + wow.height / 2 }],
+		});
+		await expect(pickerItem(page, opening(), 'Wow')).toHaveClass(/reactions-picker-item--hover/);
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+		await cdp.detach();
+		await settled(page, opening());
+
+		expect(await reactionOf('trooper1', opening())).toBe('Wow');
+		// The slide chose a reaction rather than scrolling the page.
+		expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
 	});
 });

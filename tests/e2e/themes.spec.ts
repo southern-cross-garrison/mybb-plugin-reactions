@@ -1,24 +1,35 @@
 import { test, expect } from '../helpers/fixtures';
 import { loginAs } from '../helpers/auth';
 import { mainThread, queryOne, reactionOf, setUserColumn } from '../helpers/db';
-import { bar, clickReact, openThread, pickReaction } from '../helpers/reactions';
+import { clickReact, openThread, pickReaction, reactButton } from '../helpers/reactions';
 import { RowDataPacket } from 'mysql2/promise';
 
 const opening = () => mainThread().pids[0];
 
 /**
- * The bar is put into the post by a template edit, anchored on the signature, so it has
- * to land in the right place on MyBB's own templates as well as on the garrison theme's.
+ * The bar is put into the post by a template edit, anchored on the IP address row, so it
+ * has to land in the right place on MyBB's own templates as well as on the garrison theme's.
  */
 test.describe('the bar on each theme', () => {
-	test('on the garrison theme it sits in the post card, under the message', async ({ page }) => {
+	test('on the garrison theme it sits in the post card, in its bottom right corner', async ({
+		page,
+	}) => {
 		await loginAs(page, 'trooper1');
 		await openThread(page);
 
 		const post = page.locator(`#post_${opening()}`);
-		await expect(post.locator('.card-body > .reactions')).toHaveCount(1);
+		// Last in the card's body, under the IP address row.
+		await expect(post.locator('.card-body > .reactions:last-child')).toHaveCount(1);
 		// Outside the message: quick edit replaces the message's container wholesale.
 		await expect(page.locator(`#pid_${opening()} .reactions`)).toHaveCount(0);
+
+		// Its button's label lined up with the right of the card's content, under the message.
+		const label = (await reactButton(page, opening())
+			.locator('.reactions-button-label')
+			.boundingBox())!;
+		const message = (await page.locator(`#pid_${opening()}`).boundingBox())!;
+		expect(Math.abs(label.x + label.width - (message.x + message.width))).toBeLessThan(2);
+		expect(label.y).toBeGreaterThan(message.y + message.height);
 
 		await clickReact(page, opening());
 		expect(await reactionOf('trooper1', opening())).toBe('Like');
@@ -36,20 +47,21 @@ test.describe('the bar on each theme', () => {
 			await openThread(page);
 
 			const post = page.locator(`#post_${opening()}`);
-			await expect(post.locator('.post_content > .reactions')).toHaveCount(1);
+			// Last in the post's content, under the row with the IP address.
+			await expect(post.locator('.post_content > .reactions:last-child')).toHaveCount(1);
 			await expect(page.locator(`#pid_${opening()} .reactions`)).toHaveCount(0);
 			// Only once, though both postbit templates were edited.
 			await expect(page.locator('.reactions')).toHaveCount(mainThread().pids.length);
 
 			await pickReaction(page, opening(), 'Wow');
 			expect(await reactionOf('trooper1', opening())).toBe('Wow');
-			await expect(bar(page, opening()).locator('.reactions-summary')).toBeVisible();
+			await expect(reactButton(page, opening())).toHaveText('Wow');
 
 			// The classic layout is the other template the edit made.
 			await setUserColumn('trooper1', 'classicpostbit', 1);
 			await openThread(page);
 			await expect(
-				page.locator(`#post_${opening()}.classic .post_content > .reactions`)
+				page.locator(`#post_${opening()}.classic .post_content > .reactions:last-child`)
 			).toHaveCount(1);
 		} finally {
 			await setUserColumn('trooper1', 'style', 0);
