@@ -1,0 +1,19 @@
+---
+title: Settings
+description: Notifications, the summary, and the upload limit.
+sidebar:
+  order: 2
+---
+
+import { Image } from 'astro:assets';
+import settings from '../../../assets/screenshots/admins/settings.png';
+
+The settings are under **Configuration**, then **Settings**, then **Reactions**.
+
+<Image src={settings} alt="The Reactions settings group" />
+
+| Setting                             | Default | What it does                                                                                    |
+| ----------------------------------- | ------- | ----------------------------------------------------------------------------------------------- |
+| Tell authors about reactions        | Yes     | Sends an author a private message the first time each member reacts to their post. Members can still turn it off for themselves. |
+| Reactions shown in a post's summary | 3       | How many of a post's most used reactions are pictured beside its count.                         |
+| Largest reaction image (KB)         | 256     | The biggest image you can upload for a reaction.                                               |

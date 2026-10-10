@@ -1,0 +1,24 @@
+---
+title: Uninstalling
+description: Removing the plugin.
+sidebar:
+  order: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+**Deactivating** (Configuration, then Plugins) takes the reactions bar out of posts and
+keeps everything else. Activating again brings it all back.
+
+**Uninstalling** removes the plugin's tables, settings, templates, stylesheet and the images
+uploaded to `uploads/reactions/`, and the column it adds to the users table.
+
+<Aside type="caution">
+  Uninstalling deletes every reaction ever made, and they can't be brought back.
+</Aside>
+
+After uninstalling, delete the plugin's files: `inc/plugins/reactions.php`,
+`inc/plugins/reactions/`, `admin/modules/config/reactions.php`,
+`inc/languages/english/reactions.lang.php`,
+`inc/languages/english/admin/config_reactions.lang.php`, `images/reactions/` and
+`jscripts/reactions/`.

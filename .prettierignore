@@ -1,0 +1,12 @@
+# Environment and build output.
+test-forum/
+.devenv/
+dist/
+.astro/
+pnpm-lock.yaml
+
+# MyBB templates are eval'd PHP strings synced into the database, not HTML documents.
+plugin/**/*.html
+
+# Prettier's MDX support breaks JSX nested in list items (<Steps>, <Tabs> inside steps).
+*.mdx

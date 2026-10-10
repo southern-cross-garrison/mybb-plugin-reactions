@@ -1,0 +1,21 @@
+---
+title: Members
+description: Reacting to posts.
+sidebar:
+  label: Overview
+  order: 0
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import reacted from '../../../assets/screenshots/members/reacted.png';
+
+Every post has a **React** button under it, and a summary of how people have reacted.
+
+<Image src={reacted} alt="A post with a Love reaction picked, and its summary reading You and 4 others" />
+
+<CardGrid>
+  <LinkCard title="Reacting to a post" description="React, change your reaction, or take it back." href="reacting/" />
+  <LinkCard title="Seeing who reacted" description="Who reacted to a post, and with what." href="who-reacted/" />
+  <LinkCard title="Reaction notifications" description="The message you get when someone reacts to your post." href="notifications/" />
+</CardGrid>

@@ -1,0 +1,33 @@
+---
+title: Reactions Guide
+description: How to react to posts, and manage reactions, on the Southern Cross Garrison forums.
+template: splash
+hero:
+  tagline: React to posts, see who reacted, and choose the forum's reactions.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import picker from '../../assets/screenshots/members/picker.png';
+
+<Image src={picker} alt="A post with the reaction picker open above its React button" />
+
+## Which guide do I need?
+
+<CardGrid>
+  <LinkCard
+    title="Members"
+    description="React to a post, change or take back a reaction, see who reacted, and choose whether you're told."
+    href="members/"
+  />
+  <LinkCard
+    title="Administrators"
+    description="Add, edit, reorder, hide and delete the forum's reactions, and the settings."
+    href="admins/"
+  />
+  <LinkCard
+    title="Webmasters"
+    description="Installing, upgrading, theming and removing the plugin."
+    href="webmasters/"
+  />
+</CardGrid>

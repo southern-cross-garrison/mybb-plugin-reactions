@@ -1,0 +1,14 @@
+/*
+ * MyBB Reactions Plugin - Admin CP: Configuration -> Reactions
+ */
+
+.reactions-admin-image {
+	width: 32px;
+	height: 32px;
+	object-fit: contain;
+	vertical-align: middle;
+}
+
+.reactions-admin-current {
+	margin-bottom: 0.5em;
+}

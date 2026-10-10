@@ -1,0 +1,26 @@
+---
+title: Themes
+description: How the plugin fits into a theme, and restyling it.
+sidebar:
+  order: 3
+---
+
+Activating the plugin edits two of MyBB's templates in every theme:
+
+- `postbit` and `postbit_classic` get `{$post['reactions']}` straight after
+  `{$post['signature']}` - under the message, outside the part quick edit replaces.
+- `usercp_options_pms` gets `{$reactions_usercp_option}` at the end.
+
+Deactivating takes both out again. If you add a theme after activating, deactivate and
+activate the plugin to edit that theme too. A theme without `{$post['signature']}` in its
+postbit won't get the bar; add `{$post['reactions']}` wherever you want it.
+
+## Restyling
+
+The plugin's look is in the `reactions.css` stylesheet, attached to the master theme so
+every theme inherits it. To change it for one theme, edit that theme's copy under
+**Templates & Style**, then **Themes**. Colours use Bootstrap's `--bs-body-bg` and
+`--bs-primary` where a theme defines them.
+
+The plugin's templates are in the **Reactions** group under **Templates & Style**, then
+**Templates**.

@@ -1,0 +1,7 @@
+<form class="reactions-controls" action="{$mybb->settings['bburl']}/misc.php" method="post">
+<input type="hidden" name="action" value="reactions_react" />
+<input type="hidden" name="pid" value="{$pid}" />
+<input type="hidden" name="my_post_key" value="{$mybb->post_code}" />
+<button type="submit" name="rid" value="{$button_rid}" class="reactions-button{$button_class}" aria-pressed="{$button_pressed}" aria-expanded="false" aria-controls="reactions_picker_{$pid}"><img src="{$button_image}" alt="" class="reactions-icon" /><span class="reactions-button-label">{$button_label}</span></button>
+<div class="reactions-picker" id="reactions_picker_{$pid}" role="toolbar" aria-label="{$lang->reactions_picker_label}">{$picker_items}</div>
+</form>

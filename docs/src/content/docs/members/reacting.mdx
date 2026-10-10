@@ -1,0 +1,68 @@
+---
+title: Reacting to a post
+description: React to a post, change your reaction, or take it back.
+sidebar:
+  order: 1
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import button from '../../../assets/screenshots/members/react-button.png';
+import picker from '../../../assets/screenshots/members/picker.png';
+import pickerPhone from '../../../assets/screenshots/members/picker-phone.png';
+import reacted from '../../../assets/screenshots/members/reacted.png';
+
+You can react to any post you can read, including your own and posts in closed threads.
+You have one reaction per post.
+
+## Like a post
+
+<Steps>
+
+1. Click **Like** under the post.
+
+   <Image src={button} alt="A post's reactions, with the Like button circled" />
+
+</Steps>
+
+The button turns blue and shows your reaction, and the post's summary now counts you.
+
+## Pick a different reaction
+
+<Steps>
+
+1. Rest your mouse on **Like** under the post, without clicking. After a moment the
+   reactions pop up above it.
+
+   <Image src={picker} alt="The reactions popped up above the Like button: Like, Love, Haha, Wow, Sad and Angry" />
+
+2. Click the reaction you want.
+
+   <Image src={reacted} alt="The post with Love picked: the button reads Love and the summary reads You and 4 others" />
+
+</Steps>
+
+On a phone or tablet, **press and hold** the button instead, then tap the reaction.
+
+<Image src={pickerPhone} alt="The reactions popped up above the button on a phone" />
+
+<Aside type="tip">
+  A quick tap or click is always the plain reaction - Like, or taking yours back. Hold, or
+  rest the mouse, to choose.
+</Aside>
+
+## Change your reaction
+
+Pick a different reaction the same way, and it replaces your old one. You never have more
+than one reaction on a post.
+
+## Take your reaction back
+
+Click your reaction under the post - the blue button - and it's gone. Picking the same
+reaction again from the pop-up does the same.
+
+## Using the keyboard
+
+Tab to the button and press **Enter** to like the post (or take your reaction back). Press
+the **up arrow** to open the reactions, the **left** and **right arrows** to move between
+them, and **Enter** to pick one. **Escape** closes them.

@@ -1,0 +1,96 @@
+---
+title: Managing reactions
+description: Add, edit, reorder, hide and delete the forum's reactions.
+sidebar:
+  order: 1
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import menu from '../../../assets/screenshots/admins/menu.png';
+import add from '../../../assets/screenshots/admins/add-reaction.png';
+import options from '../../../assets/screenshots/admins/options-menu.png';
+import order from '../../../assets/screenshots/admins/order.png';
+import confirm from '../../../assets/screenshots/admins/delete-confirm.png';
+
+## Open the Reactions page
+
+<Steps>
+
+1. In the Admin CP, click **Configuration**, then **Reactions** in the menu on the left.
+
+   <Image src={menu} alt="The Configuration menu with Reactions circled" />
+
+</Steps>
+
+The page lists every reaction in the order members see them, with how many times each has
+been used.
+
+## Add a reaction
+
+<Steps>
+
+1. Click **Add Reaction**.
+2. Type a **Name** - up to 50 characters - and choose an **Image**, then click
+   **Save Reaction**.
+
+   <Image src={add} alt="The Add Reaction form with the name Fire and an image chosen" />
+
+</Steps>
+
+The image has to be a PNG, GIF, JPEG, WebP or SVG of up to 256 KB. Square images look best:
+they're shown small (18 pixels) in a post's summary and bigger (36) in the pop-up.
+
+<Aside>
+  An SVG can carry code that would run on the forum for anyone who opened the image, so
+  the forum cleans every SVG you upload: it keeps the drawing and removes scripts, links
+  and anything else that could run or fetch something. If it removed anything, it says so
+  when you save. An ordinary icon comes through unchanged.
+</Aside>
+
+## Edit a reaction
+
+Click its name. You can change the name, the order, and whether it's active, and upload a
+new image - or leave the image empty to keep the one it has. Members who reacted with it
+keep their reaction.
+
+## Change the order
+
+<Steps>
+
+1. Change the numbers in the **Order** column - lowest first - and click **Save Order**.
+
+   <Image src={order} alt="The Order column, with Save Order circled" />
+
+</Steps>
+
+The first active reaction is the forum's **default**: the one members get when they just
+click the button. It's marked "(default)" in the list.
+
+## Hide a reaction
+
+<Steps>
+
+1. Click **Options** beside it, then **Deactivate**.
+
+   <Image src={options} alt="The Options menu beside Angry, with Deactivate circled" />
+
+</Steps>
+
+A deactivated reaction disappears from the pop-up and from posts' summaries. Nobody's
+reaction is lost, though: activate it again (**Options**, then **Activate**) and they all
+come back.
+
+## Delete a reaction
+
+Click **Options**, then **Delete**. You're asked first, and told how many times it has been
+used - **every one of those reactions is deleted with it**.
+
+<Image src={confirm} alt="The delete confirmation, saying how many times the reaction has been used" />
+
+<Aside type="tip">
+  If you might want them back, deactivate the reaction instead.
+</Aside>
+
+Every change is recorded in the administrator log (**Tools & Maintenance**, then
+**Administrator Log**).

@@ -1,0 +1,21 @@
+---
+title: Administrators
+description: Managing the forum's reactions.
+sidebar:
+  label: Overview
+  order: 0
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import list from '../../../assets/screenshots/admins/reactions-list.png';
+
+The forum's reactions are managed in the Admin CP, under **Configuration**, then
+**Reactions**. The forum starts with six: Like, Love, Haha, Wow, Sad and Angry.
+
+<Image src={list} alt="The Reactions page in the Admin CP, listing the six reactions with how often each is used" />
+
+<CardGrid>
+  <LinkCard title="Managing reactions" description="Add, edit, reorder, hide and delete reactions." href="managing-reactions/" />
+  <LinkCard title="Settings" description="Notifications, the summary, and the upload limit." href="settings/" />
+</CardGrid>

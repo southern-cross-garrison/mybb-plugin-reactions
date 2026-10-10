@@ -1,0 +1,29 @@
+---
+title: Installing
+description: Installing the plugin on a MyBB board.
+sidebar:
+  order: 1
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import plugins from '../../../assets/screenshots/webmasters/plugins-page.png';
+
+<Steps>
+
+1. Download the zip from the [latest release](https://github.com/southern-cross-garrison/mybb-plugin-reactions/releases/latest).
+2. Upload its contents to the forum's root directory. Its folders - `inc/`, `admin/`,
+   `images/` and `jscripts/` - line up with the forum's own.
+3. In the Admin CP, go to **Configuration**, then **Plugins**, and click **Install &
+   Activate** beside Reactions.
+
+   <Image src={plugins} alt="The Plugins page with the Reactions plugin installed and active" />
+
+</Steps>
+
+Installing creates the plugin's tables, settings, templates and stylesheet, and the six
+default reactions. Activating adds the reactions bar to every theme's post templates and
+the notification option to the User CP.
+
+Uploaded reaction images go in `uploads/reactions/`, which the plugin creates. MyBB's
+`uploads/` directory has to be writable, as it already does for attachments.

@@ -1,0 +1,35 @@
+---
+title: Reaction notifications
+description: The message you get when someone reacts to your post, and turning it off.
+sidebar:
+  order: 3
+---
+
+import { Steps } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import message from '../../../assets/screenshots/members/notification.png';
+import option from '../../../assets/screenshots/members/usercp-option.png';
+
+The first time someone reacts to one of your posts, you get a private message from them
+saying how they reacted, with a link to the post.
+
+<Image src={message} alt="A private message: trooper1 reacted to your post in Reactions Test Thread with: Like" />
+
+You hear about each person once per post. If they change their reaction, or take it back
+and react again, you don't get another message. You're never told about your own
+reactions.
+
+## Turn reaction messages off
+
+<Steps>
+
+1. Go to **User CP**, then **Edit Options**.
+2. Under the private messaging options, untick **Send me a private message when someone
+   reacts to my posts**, and save.
+
+   <Image src={option} alt="The User CP options, with the reaction notification checkbox circled" />
+
+</Steps>
+
+You also won't get them if you've turned private messages off, or put the person on your
+ignore list.

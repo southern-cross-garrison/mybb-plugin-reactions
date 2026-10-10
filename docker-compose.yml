@@ -1,0 +1,61 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-7.4}
+    # Tagged per version so switching back and forth reuses each build.
+    image: mybb-reactions-web:php${PHP_VERSION:-7.4}
+    container_name: mybb-reactions-web
+    ports:
+      - '${WEB_PORT:-8090}:80'
+    volumes:
+      # MyBB source + the deployed plugin (see scripts/deploy.sh).
+      - ./test-forum:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [mybb]
+
+  db:
+    image: mariadb:10.11
+    container_name: mybb-reactions-db
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: mybb
+      MARIADB_USER: mybb
+      MARIADB_PASSWORD: mybbpassword
+      TZ: UTC
+    ports:
+      - '${DB_PORT:-3317}:3306'
+    volumes:
+      - mybb-db-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 3s
+      timeout: 5s
+      retries: 30
+    networks: [mybb]
+
+  # Optional: `docker compose --profile tools up -d phpmyadmin`
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: mybb-reactions-phpmyadmin
+    profiles: [tools]
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - '${PMA_PORT:-8091}:80'
+    depends_on: [db]
+    networks: [mybb]
+
+volumes:
+  mybb-db-data:
+
+networks:
+  mybb:
+    driver: bridge
