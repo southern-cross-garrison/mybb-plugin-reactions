@@ -4,7 +4,6 @@
  */
 
 $l['reactions'] = "Reactions";
-$l['can_manage_reactions'] = "Can manage reactions?";
 
 $l['reactions_desc'] = "The reactions members can pick from on posts. The first active reaction is the one a plain click on the React button adds.";
 $l['reactions_add'] = "Add Reaction";

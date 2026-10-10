@@ -12,12 +12,16 @@ import { FORUM_DIR } from '../helpers/config';
 import {
 	adminLog,
 	countReactions,
+	execute,
 	getReaction,
 	getReactionByName,
 	mainThread,
 	react,
 	reactionOf,
 	rid,
+	setUserColumn,
+	T,
+	uid,
 	uploadedImages,
 } from '../helpers/db';
 import { withSettings } from '../helpers/settings';
@@ -86,6 +90,38 @@ test.describe('Admin CP: Configuration -> Reactions', () => {
 		await expect(page.locator(`#reaction_row_${rid('Love')} td:nth-child(4)`)).toHaveText('2');
 		await expect(page.locator(`#reaction_row_${rid('Wow')} td:nth-child(4)`)).toHaveText('1');
 		await expect(page.locator(`#reaction_row_${rid('Sad')} td:nth-child(4)`)).toHaveText('0');
+	});
+
+	test('is there for an administrator who is not a super admin, whatever their saved permissions', async ({
+		page,
+	}) => {
+		// The fixture admin is a super admin, who is never refused anything. An ordinary
+		// administrator has a saved permission list, and MyBB hides any page that declares
+		// a permission missing from it - which every permission added after the list was
+		// saved is. This is that administrator: staff, given Configuration access before
+		// the plugin existed.
+		const staff = uid('staff');
+		const permissions = 'a:1:{s:6:"config";a:2:{s:8:"settings";i:1;s:7:"plugins";i:1;}}';
+		await setUserColumn('staff', 'usergroup', 4);
+		await execute(
+			`INSERT INTO ${T('adminoptions')} (uid, notes, permissions, defaultviews) VALUES (?, '', ?, '')`,
+			[staff, permissions]
+		);
+
+		try {
+			await loginToAdminCp(page, 'staff');
+			await page.goto('/admin/index.php?module=config');
+			await page
+				.locator('.menu a')
+				.filter({ hasText: /^Reactions$/ })
+				.click();
+			await expect(page).toHaveURL(/module=config-reactions$/);
+			await expect(page.locator('tr[id^="reaction_row_"]')).toHaveCount(6);
+		} finally {
+			await setUserColumn('staff', 'usergroup', 2);
+			await execute(`DELETE FROM ${T('adminoptions')} WHERE uid = ?`, [staff]);
+			await execute(`DELETE FROM ${T('adminsessions')} WHERE uid = ?`, [staff]);
+		}
 	});
 
 	test('adds a reaction with an uploaded image, which members can then pick', async ({ page }) => {

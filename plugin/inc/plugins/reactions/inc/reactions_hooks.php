@@ -518,23 +518,6 @@ function reactions_admin_config_action_handler(&$actions)
 }
 
 /**
- * Hooks: admin_config_permissions
- *
- * @param array $admin_permissions
- * @return array
- */
-function reactions_admin_config_permissions(&$admin_permissions)
-{
-    global $lang;
-
-    $lang->load('config_reactions', false, true);
-
-    $admin_permissions['reactions'] = $lang->can_manage_reactions;
-
-    return $admin_permissions;
-}
-
-/**
  * Word the plugin's entries in the administrator log. MyBB looks the wording up as
  * admin_log_<module>_<action>, which is in the plugin's own Admin CP language file.
  *

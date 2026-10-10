@@ -23,10 +23,13 @@ $plugins->add_hook("datahandler_user_delete_content", "reactions_users_deleted")
 
 if(defined('IN_ADMINCP'))
 {
-    // The Reactions page lives under Configuration, beside Smilies and Post Icons.
+    // The Reactions page lives under Configuration, beside Smilies and Post Icons. It
+    // deliberately declares no admin permission: anyone who can reach the Admin CP may
+    // manage reactions. A declared permission starts out as "No" for every administrator
+    // whose permissions were saved before the plugin arrived, which hides the page from
+    // everyone but the super admins until someone goes and grants it.
     $plugins->add_hook("admin_config_menu", "reactions_admin_config_menu");
     $plugins->add_hook("admin_config_action_handler", "reactions_admin_config_action_handler");
-    $plugins->add_hook("admin_config_permissions", "reactions_admin_config_permissions");
     $plugins->add_hook("admin_tools_get_admin_log_action", "reactions_admin_log_action");
 }
 else
