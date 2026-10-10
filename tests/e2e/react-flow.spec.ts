@@ -7,6 +7,7 @@ import {
 	openThread,
 	pickReaction,
 	reactButton,
+	settled,
 	summary,
 	summaryIcons,
 } from '../helpers/reactions';
@@ -45,6 +46,39 @@ test.describe('reacting to a post', () => {
 		expect(await reactionOf('trooper1', opening())).toBeNull();
 		await expect(reactButton(page, opening())).toHaveAttribute('aria-pressed', 'false');
 		await expect(summary(page, opening())).toHaveCount(0);
+	});
+
+	test('the button shows a spinner in place of its picture while the reaction is saved', async ({
+		page,
+	}) => {
+		await openThread(page);
+
+		// Hold the request until the spinner has been looked at.
+		let release!: () => void;
+		const held = new Promise<void>((resolve) => (release = resolve));
+		await page.route('**/misc.php', async (route) => {
+			await held;
+			await route.continue();
+		});
+
+		const button = reactButton(page, opening());
+		const spinner = () =>
+			button.evaluate((element) => getComputedStyle(element, '::before').animationName);
+		await button.click();
+
+		await expect(bar(page, opening())).toHaveAttribute('aria-busy', 'true');
+		await expect(button.locator('.reactions-icon')).toBeHidden();
+		expect(await spinner()).toBe('reactions-spin');
+
+		release();
+		await settled(page, opening());
+		expect(await reactionOf('trooper1', opening())).toBe('Like');
+		await expect(reactButton(page, opening()).locator('.reactions-icon')).toBeVisible();
+		expect(
+			await reactButton(page, opening()).evaluate(
+				(element) => getComputedStyle(element, '::before').content
+			)
+		).toBe('none');
 	});
 
 	test('picking from the picker reacts with that reaction, and the change survives a reload', async ({

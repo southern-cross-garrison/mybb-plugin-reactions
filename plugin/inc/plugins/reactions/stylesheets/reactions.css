@@ -59,6 +59,7 @@
 }
 
 .reactions-button {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	gap: 0.35em;
@@ -109,6 +110,38 @@
 .reactions [aria-busy='true'],
 .reactions[aria-busy='true'] {
 	opacity: 0.6;
+}
+
+/* While a reaction is being saved, a spinner stands in for the button's picture. The
+   picture keeps its place, hidden, so the button does not change size. */
+.reactions[aria-busy='true'] .reactions-button {
+	cursor: progress;
+}
+
+.reactions[aria-busy='true'] .reactions-button .reactions-icon {
+	visibility: hidden;
+}
+
+.reactions[aria-busy='true'] .reactions-button::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	/* Over the picture: past the button's padding, and centred in the picture's 18px. */
+	left: calc(0.6em + 2px);
+	box-sizing: border-box;
+	width: 14px;
+	height: 14px;
+	margin-top: -7px;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: reactions-spin 0.7s linear infinite;
+}
+
+@keyframes reactions-spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 /* The picker, which floats above the button. */
@@ -209,6 +242,11 @@ html:not(.reactions-js) .reactions-controls:focus-within .reactions-picker {
 
 	.reactions-picker-item {
 		transition: none;
+	}
+
+	/* Slower rather than still: a spinner that does not turn does not say it is working. */
+	.reactions[aria-busy='true'] .reactions-button::before {
+		animation-duration: 1.5s;
 	}
 }
 
