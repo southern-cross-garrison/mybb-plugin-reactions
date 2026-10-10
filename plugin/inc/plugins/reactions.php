@@ -52,7 +52,7 @@ function reactions_info()
         "website"       => "https://github.com/southern-cross-garrison/mybb-plugin-reactions",
         "author"        => "Kevin Brown (TK-33151)",
         "authorsite"    => "https://www.501scg.org/",
-        "version"       => "1.0.2",
+        "version"       => "1.0.3",
         "guid"          => "4f0e60c5-a62e-4689-8465-17e7f540bb62",
         "codename"      => "reactions",
         "compatibility" => "18*"
