@@ -50,7 +50,7 @@ function reactions_info()
         "author"        => "Kevin Brown (TK-33151)",
         "authorsite"    => "https://www.501scg.org/",
         "version"       => "1.0.0",
-        "guid"          => "2321a1cf-8455-4bdd-993e-f07463ae19dc",
+        "guid"          => "4f0e60c5-a62e-4689-8465-17e7f540bb62",
         "codename"      => "reactions",
         "compatibility" => "18*"
     );
