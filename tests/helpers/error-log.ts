@@ -12,7 +12,8 @@ import { runPhp } from './container';
  * for a PM from the board itself. Its reply forms read `$closeoption` and `$stickoption`,
  * which MyBB only sets for a moderator, and its forum list reads the last post's thread
  * prefix and icon (`tpprefix`, `tpicon`), which MyBB only sets for a forum whose last thread
- * has them. Matched by exact message and only inside an eval'd template, so anything else a
+ * has them. Its forum page reads `$inline_edit_js`, which MyBB only sets on the search
+ * results. Matched by exact message and only inside an eval'd template, so anything else a
  * page logs still counts.
  */
 const THEME_TEMPLATE_WARNINGS = [
@@ -24,6 +25,7 @@ const THEME_TEMPLATE_WARNINGS = [
 	'Undefined variable $stickoption',
 	'Undefined array key "tpprefix"',
 	'Undefined array key "tpicon"',
+	'Undefined variable $inline_edit_js',
 ];
 
 // MyBB's log closes the message with its tag and PHP's goes on to say where, so neither

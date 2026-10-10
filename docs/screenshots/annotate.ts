@@ -140,9 +140,17 @@ export async function shot(area: Locator, name: string, options: ShotOptions = {
 	const targets = pending.get(page) ?? [];
 	pending.delete(page);
 
+	const image = await capture(area, targets, { crop, minWidth, minHeight, padding, include });
+	await save(name, image);
+}
+
+/**
+ * Save PNG bytes as `<guide>/<name>.png` - for a picture put together from several
+ * captures rather than taken in one. Left alone when the picture is the same, as `shot()`.
+ */
+export async function save(name: string, image: Buffer): Promise<void> {
 	const file = path.join(SCREENSHOT_DIR, `${name}.png`);
 	fs.mkdirSync(path.dirname(file), { recursive: true });
-	const image = await capture(area, targets, { crop, minWidth, minHeight, padding, include });
 	if (await differs(file, image)) {
 		fs.writeFileSync(file, image);
 	}
