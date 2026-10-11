@@ -25,7 +25,6 @@ test.describe('reaction names are escaped', () => {
 		await expect(reactButton(page, opening())).toHaveText(NAME);
 		// Like is the first reaction in the picker.
 		const item = bar(page, opening()).locator('.reactions-picker-item').first();
-		await expect(item).toHaveAttribute('title', NAME);
 		await expect(item).toHaveAttribute('aria-label', NAME);
 		await expect(summary(page, opening()).locator('img').first()).toHaveAttribute('alt', NAME);
 

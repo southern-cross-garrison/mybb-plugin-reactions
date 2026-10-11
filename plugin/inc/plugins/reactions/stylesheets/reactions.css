@@ -185,6 +185,9 @@ html:not(.reactions-js) .reactions-controls:focus-within .reactions-picker {
 }
 
 .reactions-picker-item {
+	/* How much the reaction pointed at grows. Its name is drawn inside it and shrunk back
+	   by the same amount, so the label is the same size whatever the zoom. */
+	--reactions-picker-zoom: 1.55;
 	position: relative;
 	margin: 0;
 	padding: 4px;
@@ -206,7 +209,37 @@ html:not(.reactions-js) .reactions-controls:focus-within .reactions-picker {
 .reactions-picker-item--hover {
 	/* Over its neighbours, which it now overlaps. */
 	z-index: 1;
-	transform: scale(1.55) translateY(-9px);
+	transform: scale(var(--reactions-picker-zoom)) translateY(-9px);
+}
+
+/* The name of the reaction pointed at, in a dark pill above it - over a mouse, above a
+   finger sliding across the picker (which hides the picture itself), and on a reaction
+   reached with the keyboard. Taken from aria-label, which is already the name and no
+   markup, so the template does not repeat it. */
+.reactions-picker-item::after {
+	content: attr(aria-label);
+	position: absolute;
+	bottom: calc(100% + 4px);
+	left: 50%;
+	padding: 3px 8px;
+	border-radius: 999px;
+	background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
+	white-space: nowrap;
+	pointer-events: none;
+	opacity: 0;
+	transform: translateX(-50%) scale(calc(1 / var(--reactions-picker-zoom)));
+	transform-origin: 50% 100%;
+	transition: opacity 0.12s ease-out;
+}
+
+.reactions-picker-item:hover::after,
+.reactions-picker-item:focus-visible::after,
+.reactions-picker-item--hover::after {
+	opacity: 1;
 }
 
 .reactions-picker-item--active::before {
@@ -240,7 +273,8 @@ html:not(.reactions-js) .reactions-controls:focus-within .reactions-picker {
 		animation: none;
 	}
 
-	.reactions-picker-item {
+	.reactions-picker-item,
+	.reactions-picker-item::after {
 		transition: none;
 	}
 

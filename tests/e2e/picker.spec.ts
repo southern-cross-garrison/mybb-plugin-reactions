@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { test, expect } from '../helpers/fixtures';
 import { loginAs } from '../helpers/auth';
 import { mainThread, react, reactionOf } from '../helpers/db';
@@ -13,6 +14,17 @@ import {
 } from '../helpers/reactions';
 
 const opening = () => mainThread().pids[0];
+
+/** The names the picker is showing above its reactions - the one pointed at, if any. */
+const labelsShown = (page: Page) =>
+	picker(page, opening())
+		.locator('.reactions-picker-item')
+		.evaluateAll((items) =>
+			items
+				.map((item) => getComputedStyle(item, '::after'))
+				.filter((label) => label.opacity === '1')
+				.map((label) => JSON.parse(label.content))
+		);
 
 /**
  * The picker opens on a long press - the mouse or a finger held on the button - or the
@@ -61,6 +73,34 @@ test.describe('the reaction picker', () => {
 		expect(await reactionOf('trooper1', opening())).toBe('Wow');
 	});
 
+	test('shows the name of the reaction pointed at, and only that one', async ({ page }) => {
+		await openThread(page);
+		await openPicker(page, opening());
+		await page.mouse.move(5, 5);
+		await expect.poll(() => labelsShown(page)).toEqual([]);
+
+		await pickerItem(page, opening(), 'Wow').hover();
+		await expect.poll(() => labelsShown(page)).toEqual(['Wow']);
+		const label = await pickerItem(page, opening(), 'Wow').evaluate((item) => {
+			const style = getComputedStyle(item, '::after');
+			return { color: style.color, background: style.backgroundColor };
+		});
+		expect(label).toEqual({ color: 'rgb(255, 255, 255)', background: 'rgba(0, 0, 0, 0.8)' });
+
+		await pickerItem(page, opening(), 'Sad').hover();
+		await expect.poll(() => labelsShown(page)).toEqual(['Sad']);
+	});
+
+	test('shows the name of the reaction reached with the keyboard', async ({ page }) => {
+		await openThread(page);
+		await reactButton(page, opening()).focus();
+		await page.keyboard.press('ArrowUp');
+		await expect.poll(() => labelsShown(page)).toEqual(['Like']);
+
+		await page.keyboard.press('ArrowRight');
+		await expect.poll(() => labelsShown(page)).toEqual(['Love']);
+	});
+
 	test('a hold that wanders off the button does not open it', async ({ page }) => {
 		await openThread(page);
 		const box = (await reactButton(page, opening()).boundingBox())!;
@@ -86,6 +126,8 @@ test.describe('the reaction picker', () => {
 		const haha = (await pickerItem(page, opening(), 'Haha').boundingBox())!;
 		await page.mouse.move(haha.x + haha.width / 2, haha.y + haha.height / 2, { steps: 5 });
 		await expect(pickerItem(page, opening(), 'Haha')).toHaveClass(/reactions-picker-item--hover/);
+		// Its name shows above it, where a finger would not cover it.
+		await expect.poll(() => labelsShown(page)).toEqual(['Haha']);
 		await page.mouse.up();
 		await settled(page, opening());
 
